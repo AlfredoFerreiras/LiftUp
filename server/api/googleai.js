@@ -7,27 +7,33 @@ require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 // ...
-
+// Function to sanitize text by removing or replacing asterisks
+function sanitizeText(text) {
+  // Remove both asterisks and dashes
+  return text.replace(/[\*\-\#]/g, "");
+}
 // Endpoint for generating company improvement ideas
 router.post("/improve-company", async (req, res) => {
   try {
     const { companyName, description, budget, goal } = req.body.companyData;
 
-    // Prepare the prompt for generating content
-    const prompt = `Limit everything to only 2 bullet points with 2 ideas, Given a company name and its description, generate innovative ideas on how to enhance its operations, offerings, or customer experience. Be creative, practical, and provide at least one actionable suggestion. Include ideas on how to utilize the budget effectively.\n\nCompany Name: ${companyName}\nDescription: ${description}\nBudget: ${budget}\nGoal: ${goal}`;
+    const prompt = `For the company "${companyName}" described as "${description}", with a budget of ${budget} and aiming to achieve "${goal}", generate comprehensive and innovative ideas that will benefit the company. Structure the response with clear headings for each category (e.g., "Operations Enhancement", "Customer Experience Improvement", and "Budget Allocation") followed immediately by the ideas related to that category. Each idea should include an actionable suggestion, its expected impact on the company, and its associated budget allocation. Ensure the ideas under each category are listed in a bullet-point format directly after the category's introduction, creating a seamless flow from category title to the ideas themselves. The budget allocation for each idea should be mentioned directly alongside the idea for clarity and easy reference.`;
 
-    // For text-only input, use the gemini-pro model
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    // Generate content based on the prompt
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    1;
-    const text = await response.text();
 
-    // Return the generated ideas as a response
+    const text = await response.text();
+    console.log(text);
+
+    // Sanitize the generated text before returning
+    const sanitizedText = sanitizeText(text);
     res.json({
-      results: text.split("\n").filter((line) => line.trim() !== ""),
+      results: sanitizedText
+        .split("\n")
+        .filter((line) => line.trim() !== "")
+        .slice(0, 4),
     });
   } catch (error) {
     console.error("An error occurred:", error);

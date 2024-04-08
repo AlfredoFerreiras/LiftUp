@@ -39,23 +39,33 @@ class App extends React.Component {
       <Fragment>
         <Navbar isLoggedIn={isLoggedIn} />
         <Routes>
+          {/* Redirect logged-in users trying to access login/signup to Home */}
           {isLoggedIn ? (
             <>
+              <Route path="/login" element={<Navigate replace to="/home" />} />
+              <Route path="/signup" element={<Navigate replace to="/home" />} />
               <Route path="/home" element={<Home />} />
               <Route path="/About" element={<AboutUs />} />
               <Route path="/about/team" element={<TeamMemberCard />} />
-              <Route path="/profile" element={<Profile />} />
               <Route path="/companies" element={<CompanyList />} />
-              <Route path="/companies/:id/ideas" element={<CompanyIdeas />} />
               <Route path="/companies/:id" element={<SingleCompany />} />
               <Route path="/careers" element={<Careers />} />
+              {/* Protected Routes for logged-in users */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/companies/:id/ideas" element={<CompanyIdeas />} />
               <Route path="/Features" element={<Feature />} />
               <Route path="/todo" element={<TodoList />} />
               <Route path="*" element={<Navigate replace to="/home" />} />
             </>
           ) : (
             <>
-              <Route path="/" element={<Login />} />
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/About" element={<AboutUs />} />
+              <Route path="/about/team" element={<TeamMemberCard />} />
+              <Route path="/companies" element={<CompanyList />} />
+              <Route path="/companies/:id" element={<SingleCompany />} />
+              <Route path="/careers" element={<Careers />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="*" element={<Navigate replace to="/" />} />
